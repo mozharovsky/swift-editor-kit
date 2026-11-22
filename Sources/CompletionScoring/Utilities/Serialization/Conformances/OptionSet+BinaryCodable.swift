@@ -8,19 +8,21 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package protocol OptionSetBinaryCodable: OptionSet & BinaryCodable {
+public protocol OptionSetBinaryCodable: OptionSet & BinaryCodable {
 }
 
 extension OptionSetBinaryCodable where RawValue: BinaryCodable {
-  package init(_ decoder: inout BinaryDecoder) throws {
+  public init(_ decoder: inout BinaryDecoder) throws {
     try self.init(rawValue: RawValue(&decoder))
   }
 
-  package func encode(_ encoder: inout BinaryEncoder) {
+  public func encode(_ encoder: inout BinaryEncoder) {
     encoder.write(rawValue)
   }
 }

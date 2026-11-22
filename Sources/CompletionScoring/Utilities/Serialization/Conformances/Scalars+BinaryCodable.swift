@@ -8,6 +8,8 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
@@ -19,13 +21,13 @@ protocol IntegerBinaryCodable: BinaryCodable {
 }
 
 extension IntegerBinaryCodable {
-  package init(_ decoder: inout BinaryDecoder) throws {
+  public init(_ decoder: inout BinaryDecoder) throws {
     var littleEndianRepresentation = Self.zero
     try decoder.read(rawBytesInto: &littleEndianRepresentation)
     self.init(littleEndian: littleEndianRepresentation)
   }
 
-  package func encode(_ encoder: inout BinaryEncoder) {
+  public func encode(_ encoder: inout BinaryEncoder) {
     encoder.write(rawBytesOf: littleEndian)
   }
 }
@@ -40,31 +42,31 @@ extension Int32: IntegerBinaryCodable {}
 extension Int64: IntegerBinaryCodable {}
 
 extension Int: BinaryCodable {
-  package init(_ decoder: inout BinaryDecoder) throws {
+  public init(_ decoder: inout BinaryDecoder) throws {
     let value64 = try Int64(&decoder)
     // Only possible when crossing architectures.
     self = try Int(exactly: value64).unwrap(orThrow: "Could not coerce \(value64) to an Int")
   }
 
-  package func encode(_ encoder: inout BinaryEncoder) {
+  public func encode(_ encoder: inout BinaryEncoder) {
     Int64(self).encode(&encoder)
   }
 }
 
 extension UInt: BinaryCodable {
-  package init(_ decoder: inout BinaryDecoder) throws {
+  public init(_ decoder: inout BinaryDecoder) throws {
     let value64 = try UInt64(&decoder)
     // Only possible when crossing architectures.
     self = try UInt(exactly: value64).unwrap(orThrow: "Could not coerce \(value64) to a UInt")
   }
 
-  package func encode(_ encoder: inout BinaryEncoder) {
+  public func encode(_ encoder: inout BinaryEncoder) {
     UInt64(self).encode(&encoder)
   }
 }
 
 extension Bool: BinaryCodable {
-  package init(_ decoder: inout BinaryDecoder) throws {
+  public init(_ decoder: inout BinaryDecoder) throws {
     let representation = try UInt8(&decoder)
     if representation <= 1 {
       self = (representation == 1)
@@ -74,7 +76,7 @@ extension Bool: BinaryCodable {
     }
   }
 
-  package func encode(_ encoder: inout BinaryEncoder) {
+  public func encode(_ encoder: inout BinaryEncoder) {
     UInt8(self ? 1 : 0).encode(&encoder)
   }
 }
@@ -86,11 +88,11 @@ protocol FloatingPointBinaryCodable: BinaryCodable, BinaryFloatingPoint {
 }
 
 extension FloatingPointBinaryCodable {
-  package init(_ decoder: inout BinaryDecoder) throws {
+  public init(_ decoder: inout BinaryDecoder) throws {
     try self.init(bitPattern: BitPatternType(&decoder))
   }
 
-  package func encode(_ encoder: inout BinaryEncoder) {
+  public func encode(_ encoder: inout BinaryEncoder) {
     encoder.write(bitPattern)
   }
 }

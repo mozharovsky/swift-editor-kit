@@ -1,0 +1,28 @@
+# CodeRabbit checks the rules that the build cannot evaluate.
+
+reviews:
+  auto_review:
+    enabled: true
+    base_branches:
+      - ".*"
+    auto_incremental_review: false
+  path_instructions:
+    - path: "{Sources,Tests}/**"
+      instructions: |
+        These files come from an upstream project. Apply the Upstream code rules in AGENTS.md.
+        Flag a change to an upstream file that the standalone package does not need, and a change
+        that NOTICE does not describe. Flag a changed upstream file without the modification line
+        below its license header. Do not request style, naming, or documentation changes to
+        upstream code.
+    - path: "{Package.swift,Sources/**/StandaloneSupport.swift}"
+      instructions: |
+        Apply the Swift standards in AGENTS.md.
+    - path: "**/*.md"
+      instructions: |
+        Enforce the Prose rules in AGENTS.md. Flag em dashes, semicolons, filler, marketing
+        adjectives, rhetorical questions, exclamation marks, and text that records history
+        instead of current behavior.
+    - path: "NOTICE"
+      instructions: |
+        Check that NOTICE names the upstream project, tag, and commit of every module and
+        describes every change that the diff makes to upstream files.

@@ -8,6 +8,8 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
@@ -39,8 +41,8 @@ import Foundation
 ///     * Character in pattern are in different order from candidate
 ///     * Multiple distinct pattern characters mapped to the same bit, and only one of them was
 ///       in the candidate. For example, both '8' and 'x' map to the same bit.
-package struct RejectionFilter {
-  package enum Match {
+public struct RejectionFilter: Sendable {
+  public enum Match: Sendable {
     case no
     case maybe
   }
@@ -79,13 +81,13 @@ package struct RejectionFilter {
     return mask | 0b01
   }
 
-  package init<Bytes: Collection>(bytes: Bytes) where Bytes.Element == UTF8Byte {
+  public init<Bytes: Collection>(bytes: Bytes) where Bytes.Element == UTF8Byte {
     for byte in bytes {
       mask = mask | maskBit(byte: byte)
     }
   }
 
-  package init<Bytes: Collection>(lowercaseBytes: Bytes) where Bytes.Element == UTF8Byte {
+  public init<Bytes: Collection>(lowercaseBytes: Bytes) where Bytes.Element == UTF8Byte {
     for byte in lowercaseBytes {
       mask = mask | maskBit(byte: byte)
     }
@@ -95,15 +97,15 @@ package struct RejectionFilter {
     self.mask = mask
   }
 
-  package init(lowercaseByte: UTF8Byte) {
+  public init(lowercaseByte: UTF8Byte) {
     mask = maskBit(byte: lowercaseByte)
   }
 
-  package init(string: String) {
+  public init(string: String) {
     self.init(bytes: string.utf8)
   }
 
-  package static func match(pattern: RejectionFilter, candidate: RejectionFilter) -> Match {
+  public static func match(pattern: RejectionFilter, candidate: RejectionFilter) -> Match {
     return (pattern.mask & candidate.mask) == pattern.mask ? .maybe : .no
   }
 
@@ -122,14 +124,14 @@ package struct RejectionFilter {
 }
 
 extension RejectionFilter: CustomStringConvertible {
-  package var description: String {
+  public var description: String {
     let base = String(mask, radix: 2)
     return "0b" + String(repeating: "0", count: mask.bitWidth - base.count) + base
   }
 }
 
 extension RejectionFilter: Equatable {
-  package static func == (lhs: RejectionFilter, rhs: RejectionFilter) -> Bool {
+  public static func == (lhs: RejectionFilter, rhs: RejectionFilter) -> Bool {
     lhs.mask == rhs.mask
   }
 }

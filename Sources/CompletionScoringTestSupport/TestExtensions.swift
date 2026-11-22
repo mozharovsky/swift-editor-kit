@@ -8,12 +8,12 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 package import CompletionScoring
 import Foundation
-import SwiftExtensions
-@_spi(SourceKitLSP) import ToolsProtocolsSwiftExtensions
 import XCTest
 
 @inline(never)

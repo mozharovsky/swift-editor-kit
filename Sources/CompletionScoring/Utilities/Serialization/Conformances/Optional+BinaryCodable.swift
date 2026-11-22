@@ -8,17 +8,19 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
 extension Optional: BinaryCodable where Wrapped: BinaryCodable {
-  package init(_ decoder: inout BinaryDecoder) throws {
+  public init(_ decoder: inout BinaryDecoder) throws {
     let hasValue = try Bool(&decoder)
     self = hasValue ? try Wrapped(&decoder) : nil
   }
 
-  package func encode(_ encoder: inout BinaryEncoder) {
+  public func encode(_ encoder: inout BinaryEncoder) {
     if let value = self {
       encoder.write(true)
       encoder.write(value)

@@ -8,11 +8,13 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package enum TypeCompatibility: Equatable {
+public enum TypeCompatibility: Equatable, Sendable {
   /// Examples:
   ///  - `String` is compatible with `String`
   ///  - `String` is compatible with `String?`
@@ -39,16 +41,16 @@ extension TypeCompatibility {
   ///  This used to penalize producing an `Int` when `Int?` was expected, which isn't correct.
   /// We no longer ask providers to make this distinction
   @available(*, deprecated, renamed: "compatible")
-  package static let same = Self.compatible
+  public static let same = Self.compatible
 
   /// This used to penalize producing an `Int` when `Int?` was expected, which isn't correct.
   /// We no longer ask providers to make this distinction
   @available(*, deprecated, renamed: "compatible")
-  package static let implicitlyConvertible = Self.compatible
+  public static let implicitlyConvertible = Self.compatible
 }
 
 extension TypeCompatibility: BinaryCodable {
-  package init(_ decoder: inout BinaryDecoder) throws {
+  public init(_ decoder: inout BinaryDecoder) throws {
     self = try decoder.decodeEnumByte { decoder, n in
       switch n {
       case 0: return .compatible
@@ -62,7 +64,7 @@ extension TypeCompatibility: BinaryCodable {
     }
   }
 
-  package func encode(_ encoder: inout BinaryEncoder) {
+  public func encode(_ encoder: inout BinaryEncoder) {
     let value: UInt8
     switch self {
     case .compatible: value = 0

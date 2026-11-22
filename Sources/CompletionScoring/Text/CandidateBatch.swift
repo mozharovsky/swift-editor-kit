@@ -8,18 +8,20 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
 /// A list of possible code completion results that need to be culled and sorted based on a ``Pattern``.
-package struct CandidateBatch: Sendable {
-  package typealias UTF8Bytes = Pattern.UTF8Bytes
-  package typealias ContentType = Candidate.ContentType
+public struct CandidateBatch: Sendable {
+  public typealias UTF8Bytes = Pattern.UTF8Bytes
+  public typealias ContentType = Candidate.ContentType
 
   /// Clients can access this via `CandidateBatch.withUnsafeStorage()` so that they can have read-access without the
   /// overhead of runtime exclusitivy checks that happen when you read through a reference type.
-  package struct UnsafeStorage {
+  public struct UnsafeStorage {
     var bytes: UnsafeArray<UInt8>
     var candidateByteOffsets: UnsafeArray<Int>
     var filters: UnsafeArray<RejectionFilter>
@@ -87,12 +89,12 @@ package struct CandidateBatch: Sendable {
       filters.count
     }
 
-    package var indices: Range<Int> {
+    public var indices: Range<Int> {
       return 0..<count
     }
 
     @inline(__always)
-    package func candidate(at index: Int) -> Candidate {
+    public func candidate(at index: Int) -> Candidate {
       Candidate(bytes: bytes(at: index), contentType: contentTypes[index], rejectionFilter: filters[index])
     }
 
@@ -196,7 +198,7 @@ package struct CandidateBatch: Sendable {
     __storageBox_useAccessor.storage
   }
 
-  package init(byteCapacity: Int) {
+  public init(byteCapacity: Int) {
     self.init(candidateCapacity: byteCapacity / 16, byteCapacity: byteCapacity)
   }
 
@@ -204,11 +206,11 @@ package struct CandidateBatch: Sendable {
     __storageBox_useAccessor = StorageBox(candidateCapacity: candidateCapacity, byteCapacity: byteCapacity)
   }
 
-  package init() {
+  public init() {
     self.init(candidateCapacity: 0, byteCapacity: 0)
   }
 
-  package init(candidates: [String], contentType: ContentType) {
+  public init(candidates: [String], contentType: ContentType) {
     let byteCapacity = candidates.reduce(into: 0) { sum, string in
       sum += string.utf8.count
     }
@@ -216,7 +218,7 @@ package struct CandidateBatch: Sendable {
     append(contentsOf: candidates, contentType: contentType)
   }
 
-  package init(candidates: [UTF8Bytes], contentType: ContentType) {
+  public init(candidates: [UTF8Bytes], contentType: ContentType) {
     let byteCapacity = candidates.reduce(into: 0) { sum, candidate in
       sum += candidate.count
     }
@@ -224,11 +226,11 @@ package struct CandidateBatch: Sendable {
     append(contentsOf: candidates, contentType: contentType)
   }
 
-  package func enumerate(body: (Candidate) throws -> Void) rethrows {
+  public func enumerate(body: (Candidate) throws -> Void) rethrows {
     try readonlyStorage.enumerate(body: body)
   }
 
-  package func enumerate(body: (Int, Candidate) throws -> Void) rethrows {
+  public func enumerate(body: (Int, Candidate) throws -> Void) rethrows {
     try readonlyStorage.enumerate(0..<count, body: body)
   }
 
@@ -236,19 +238,19 @@ package struct CandidateBatch: Sendable {
     try readonlyStorage.enumerate(range, body: body)
   }
 
-  package func withAccessToCandidate<R>(at idx: Int, body: (Candidate) throws -> R) rethrows -> R {
+  public func withAccessToCandidate<R>(at idx: Int, body: (Candidate) throws -> R) rethrows -> R {
     try withUnsafeStorage { storage in
       try body(storage.candidate(at: idx))
     }
   }
 
-  package func withAccessToBytes<R>(at idx: Int, body: (UTF8Bytes) throws -> R) rethrows -> R {
+  public func withAccessToBytes<R>(at idx: Int, body: (UTF8Bytes) throws -> R) rethrows -> R {
     try withUnsafeStorage { storage in
       try body(storage.bytes(at: idx))
     }
   }
 
-  package func withUnsafeStorage<R>(_ body: (UnsafeStorage) throws -> R) rethrows -> R {
+  public func withUnsafeStorage<R>(_ body: (UnsafeStorage) throws -> R) rethrows -> R {
     try withExtendedLifetime(__storageBox_useAccessor) {
       try body(__storageBox_useAccessor.storage)
     }
@@ -267,15 +269,15 @@ package struct CandidateBatch: Sendable {
     }
   }
 
-  package subscript(stringAt index: Int) -> String {
+  public subscript(stringAt index: Int) -> String {
     readonlyStorage[stringAt: index]
   }
 
-  package var count: Int {
+  public var count: Int {
     return readonlyStorage.count
   }
 
-  package var indices: Range<Int> {
+  public var indices: Range<Int> {
     return readonlyStorage.indices
   }
 
@@ -290,37 +292,37 @@ package struct CandidateBatch: Sendable {
     body(&__storageBox_useAccessor.storage)
   }
 
-  package mutating func append(_ candidate: String, contentType: ContentType) {
+  public mutating func append(_ candidate: String, contentType: ContentType) {
     mutate { storage in
       storage.append(candidate, contentType: contentType)
     }
   }
 
-  package mutating func append(_ candidate: Candidate) {
+  public mutating func append(_ candidate: Candidate) {
     mutate { storage in
       storage.append(candidate)
     }
   }
 
-  package mutating func append(_ candidate: UTF8Bytes, contentType: ContentType) {
+  public mutating func append(_ candidate: UTF8Bytes, contentType: ContentType) {
     mutate { storage in
       storage.append(candidate, contentType: contentType)
     }
   }
 
-  package mutating func append(contentsOf candidates: [String], contentType: ContentType) {
+  public mutating func append(contentsOf candidates: [String], contentType: ContentType) {
     mutate { storage in
       storage.append(contentsOf: candidates, contentType: contentType)
     }
   }
 
-  package mutating func append(contentsOf candidates: [UTF8Bytes], contentType: ContentType) {
+  public mutating func append(contentsOf candidates: [UTF8Bytes], contentType: ContentType) {
     mutate { storage in
       storage.append(contentsOf: candidates, contentType: contentType)
     }
   }
 
-  package func filter(keepWhere predicate: (Int, Candidate) -> Bool) -> CandidateBatch {
+  public func filter(keepWhere predicate: (Int, Candidate) -> Bool) -> CandidateBatch {
     var copy = CandidateBatch()
     enumerate { index, candidate in
       if predicate(index, candidate) {
@@ -332,18 +334,18 @@ package struct CandidateBatch: Sendable {
 }
 
 extension Pattern {
-  package struct CandidateBatchesMatch: Equatable, CustomStringConvertible {
-    package var batchIndex: Int
-    package var candidateIndex: Int
-    package var textScore: Double
+  public struct CandidateBatchesMatch: Equatable, CustomStringConvertible, Sendable {
+    public var batchIndex: Int
+    public var candidateIndex: Int
+    public var textScore: Double
 
-    package init(batchIndex: Int, candidateIndex: Int, textScore: Double) {
+    public init(batchIndex: Int, candidateIndex: Int, textScore: Double) {
       self.batchIndex = batchIndex
       self.candidateIndex = candidateIndex
       self.textScore = textScore
     }
 
-    package var description: String {
+    public var description: String {
       "CandidateBatchesMatch(batch: \(batchIndex), candidateIndex: \(candidateIndex), score: \(textScore))"
     }
   }
@@ -359,12 +361,12 @@ extension Pattern {
   ///
   ///
   /// Equatable for testing.
-  package struct ScoringWorkload: Equatable {
-    package struct CandidateBatchSlice: Equatable {
+  public struct ScoringWorkload: Equatable, Sendable {
+    public struct CandidateBatchSlice: Equatable, Sendable {
       var batchIndex: Int
       var candidateRange: Range<Int>
 
-      package init(batchIndex: Int, candidateRange: Range<Int>) {
+      public init(batchIndex: Int, candidateRange: Range<Int>) {
         self.batchIndex = batchIndex
         self.candidateRange = candidateRange
       }
@@ -374,12 +376,12 @@ extension Pattern {
     var outputStartIndex: Int
     var slices: [CandidateBatchSlice] = []
 
-    package init(outputStartIndex: Int, slices: [CandidateBatchSlice] = []) {
+    public init(outputStartIndex: Int, slices: [CandidateBatchSlice] = []) {
       self.outputStartIndex = outputStartIndex
       self.slices = slices
     }
 
-    package static func workloads(
+    public static func workloads(
       for batches: [CandidateBatch],
       parallelism threads: Int
     )
@@ -436,7 +438,7 @@ extension Pattern {
   ///
   /// This is a first part of selecting matches. Later the matches will be combined with matches from other providers,
   /// where we'll pick the best matches and sort them with `selectBestMatches(from:textProvider:)`
-  package func scoredMatches(across batches: [CandidateBatch], precision: Precision) -> [CandidateBatchesMatch] {
+  public func scoredMatches(across batches: [CandidateBatch], precision: Precision) -> [CandidateBatchesMatch] {
     compactScratchArea(capacity: Self.totalCandidates(batches: batches)) { matchesScratchArea in
       let scoringWorkloads = ScoringWorkload.workloads(
         for: batches,
@@ -469,17 +471,17 @@ extension Pattern {
     }
   }
 
-  package struct CandidateBatchMatch: Equatable {
-    package var candidateIndex: Int
-    package var textScore: Double
+  public struct CandidateBatchMatch: Equatable, Sendable {
+    public var candidateIndex: Int
+    public var textScore: Double
 
-    package init(candidateIndex: Int, textScore: Double) {
+    public init(candidateIndex: Int, textScore: Double) {
       self.candidateIndex = candidateIndex
       self.textScore = textScore
     }
   }
 
-  package func scoredMatches(in batch: CandidateBatch, precision: Precision) -> [CandidateBatchMatch] {
+  public func scoredMatches(in batch: CandidateBatch, precision: Precision) -> [CandidateBatchMatch] {
     scoredMatches(across: [batch], precision: precision).map { multiMatch in
       CandidateBatchMatch(candidateIndex: multiMatch.candidateIndex, textScore: multiMatch.textScore)
     }
@@ -487,8 +489,8 @@ extension Pattern {
 }
 
 /// A single potential code completion result that can be scored against a ``Pattern``.
-package struct Candidate {
-  package enum ContentType: Equatable {
+public struct Candidate {
+  public enum ContentType: Equatable, Sendable {
     /// A symbol found by code completion.
     case codeCompletionSymbol
     /// The name of a file in the project.
@@ -498,11 +500,11 @@ package struct Candidate {
     case unknown
   }
 
-  package let bytes: Pattern.UTF8Bytes
-  package let contentType: ContentType
+  public let bytes: Pattern.UTF8Bytes
+  public let contentType: ContentType
   let rejectionFilter: RejectionFilter
 
-  package static func withAccessToCandidate<R>(
+  public static func withAccessToCandidate<R>(
     for text: String,
     contentType: ContentType,
     body: (Candidate) throws -> R
@@ -536,20 +538,20 @@ private func compactScratchArea<T>(capacity: Int, initialize: (UnsafeMutablePoin
 }
 
 extension Candidate: CustomStringConvertible {
-  package var description: String {
+  public var description: String {
     return String(bytes: bytes, encoding: .utf8) ?? "(Invalid UTF8 Sequence)"
   }
 }
 
 extension Candidate {
   @available(*, deprecated, message: "Pass an explicit content type")
-  package static func withAccessToCandidate<R>(for text: String, body: (Candidate) throws -> R) rethrows -> R {
+  public static func withAccessToCandidate<R>(for text: String, body: (Candidate) throws -> R) rethrows -> R {
     try withAccessToCandidate(for: text, contentType: .codeCompletionSymbol, body: body)
   }
 }
 
 extension CandidateBatch: Equatable {
-  package static func == (_ lhs: Self, _ rhs: Self) -> Bool {
+  public static func == (_ lhs: Self, _ rhs: Self) -> Bool {
     (lhs.count == rhs.count)
       && lhs.indices.allSatisfy { index in
         lhs.withAccessToCandidate(at: index) { lhs in
@@ -565,20 +567,20 @@ extension CandidateBatch: Equatable {
 
 extension CandidateBatch {
   @available(*, deprecated, message: "Pass an explicit content type")
-  package init(candidates: [String] = []) {
+  public init(candidates: [String] = []) {
     self.init(candidates: candidates, contentType: .codeCompletionSymbol)
   }
 
   @available(*, deprecated, message: "Pass an explicit content type")
-  package mutating func append(_ candidate: String) {
+  public mutating func append(_ candidate: String) {
     append(candidate, contentType: .codeCompletionSymbol)
   }
   @available(*, deprecated, message: "Pass an explicit content type")
-  package mutating func append(_ candidate: UTF8Bytes) {
+  public mutating func append(_ candidate: UTF8Bytes) {
     append(candidate, contentType: .codeCompletionSymbol)
   }
   @available(*, deprecated, message: "Pass an explicit content type")
-  package mutating func append(contentsOf candidates: [String]) {
+  public mutating func append(contentsOf candidates: [String]) {
     append(contentsOf: candidates, contentType: .codeCompletionSymbol)
   }
 }

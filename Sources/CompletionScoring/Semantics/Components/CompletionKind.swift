@@ -8,11 +8,13 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package enum CompletionKind: Equatable {
+public enum CompletionKind: Equatable, Sendable {
   /// Example: try, throw, where
   case keyword
 
@@ -51,7 +53,7 @@ package enum CompletionKind: Equatable {
 }
 
 extension CompletionKind: BinaryCodable {
-  package init(_ decoder: inout BinaryDecoder) throws {
+  public init(_ decoder: inout BinaryDecoder) throws {
     self = try decoder.decodeEnumByte { decoder, n in
       switch n {
       case 0: return .keyword
@@ -71,7 +73,7 @@ extension CompletionKind: BinaryCodable {
     }
   }
 
-  package func encode(_ encoder: inout BinaryEncoder) {
+  public func encode(_ encoder: inout BinaryEncoder) {
     let value: UInt8
     switch self {
     case .keyword: value = 0

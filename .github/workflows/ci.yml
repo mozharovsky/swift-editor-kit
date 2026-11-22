@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  macos:
+    name: macOS build and test
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Show the toolchain
+        run: |
+          xcodebuild -version
+          xcrun swift --version
+
+      - name: Build
+        run: xcrun swift build --build-tests
+
+      - name: Test
+        run: xcrun swift test --skip-build
+
+  linux:
+    name: Linux build and test
+    runs-on: ubuntu-24.04
+    container: swift:6.4.0-noble@sha256:64bab762bc73a3fda6d9ebc559258bd6d7660c10a705bb25ecacad2f99d066f9
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Show the toolchain
+        run: swift --version
+
+      - name: Build
+        run: swift build --build-tests
+
+      - name: Test
+        run: swift test --skip-build
+
+  signoff:
+    name: Signed commits
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Every non-merge commit needs a sign-off by its author. Merge commits that GitHub creates
+      # when it updates a branch are exempt.
+      - name: Check sign-offs
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          missing=0
+          for commit in $(git rev-list --no-merges "$BASE..$HEAD"); do
+            author=$(git log -1 --format='%an <%ae>' "$commit")
+            if ! git log -1 --format='%(trailers:key=Signed-off-by,valueonly)' "$commit" \
+              | grep -Fqx "$author"; then
+              echo "::error::$(git log -1 --format='%h %s' "$commit") has no Signed-off-by for $author."
+              missing=1
+            fi
+          done
+          exit "$missing"

@@ -8,11 +8,13 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package struct BinaryDecoder {
+public struct BinaryDecoder: Sendable {
   private let stream: [UInt8]
   private var position = 0
 

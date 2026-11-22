@@ -8,11 +8,13 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package enum Availability: Equatable {
+public enum Availability: Equatable, Sendable {
   /// Example: Either not tagged, or explicit availability is compatible with current build context
   case available
 
@@ -36,7 +38,7 @@ package enum Availability: Equatable {
 }
 
 extension Availability: BinaryCodable {
-  package init(_ decoder: inout BinaryDecoder) throws {
+  public init(_ decoder: inout BinaryDecoder) throws {
     self = try decoder.decodeEnumByte { decoder, n in
       switch n {
       case 0: return .available
@@ -51,7 +53,7 @@ extension Availability: BinaryCodable {
     }
   }
 
-  package func encode(_ encoder: inout BinaryEncoder) {
+  public func encode(_ encoder: inout BinaryEncoder) {
     let value: UInt8
     switch self {
     case .available: value = 0
@@ -67,9 +69,9 @@ extension Availability: BinaryCodable {
 }
 
 @available(*, deprecated, renamed: "Availability")
-package typealias DeprecationStatus = Availability
+public typealias DeprecationStatus = Availability
 
 extension Availability {
   @available(*, deprecated, renamed: "Availability.available")
-  package static let none = DeprecationStatus.available
+  public static let none = DeprecationStatus.available
 }

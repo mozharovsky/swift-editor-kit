@@ -8,13 +8,15 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
 /// Aggregates functionality to support the `MatchCollator.selectBestMatches(for:from:in:)` function, which sorts and
 /// selects the best matches from a list, applying the `.thorough` scoring function while being conscience of it's expense.
-package struct MatchCollator {
+public struct MatchCollator {
   private var originalMatches: UnsafeBufferPointer<Match>
   private var rescoredMatches: UnsafeMutableBufferPointer<RescoredMatch>
   private let batches: UnsafeBufferPointer<CandidateBatch.UnsafeStorage>
@@ -23,7 +25,7 @@ package struct MatchCollator {
   private let patternUTF8Length: Int
   private let tieBreaker: UnsafePointer<TieBreaker>
   private let maximumNumberOfItemsForExpensiveSelection: Int
-  package static let defaultMaximumNumberOfItemsForExpensiveSelection = 100
+  public static let defaultMaximumNumberOfItemsForExpensiveSelection = 100
 
   private init(
     originalMatches: UnsafeBufferPointer<Match>,
@@ -182,7 +184,7 @@ package struct MatchCollator {
   }
 
   /// Generated and validated by `MatchCollatorTests.testMinimumTextCutoff()`
-  package static let bestRejectedTextScoreByPatternLength: [Double] = [
+  public static let bestRejectedTextScoreByPatternLength: [Double] = [
     0.0,
     0.0,
     2.900400881379344,
@@ -340,7 +342,7 @@ package struct MatchCollator {
   /// Uses heuristics to cull matches, and then apply the expensive `.thorough` scoring function.
   ///
   /// Returns the results stably ordered by score, then text.
-  package static func selectBestMatches(
+  public static func selectBestMatches(
     _ matches: [Match],
     from batches: [CandidateBatch],
     for pattern: Pattern,
@@ -361,7 +363,7 @@ package struct MatchCollator {
   }
 
   /// Short for `selectBestMatches(_:from:for:influencingTokenizedIdentifiers:orderingTiesBy:).matches`
-  package static func selectBestMatches(
+  public static func selectBestMatches(
     for pattern: Pattern,
     from matches: [Match],
     in batches: [CandidateBatch],
@@ -384,7 +386,7 @@ package struct MatchCollator {
   ///   - identifiers: Strings from the program source, like "documentDownload"
   ///   - filterLowSignalTokens: When true, removes common tokens that would falsely signal influence, like "from".
   /// - Returns: A value suitable for use with the `influencingTokenizedIdentifiers:` parameter of `selectBestMatches(…)`.
-  package static func tokenize(
+  public static func tokenize(
     influencingTokenizedIdentifiers identifiers: [String],
     filterLowSignalTokens: Bool
   ) -> [[String]] {
@@ -394,7 +396,7 @@ package struct MatchCollator {
   }
 
   /// Only package so that we can performance test this
-  package static func performanceTest_influenceScores(
+  public static func performanceTest_influenceScores(
     for batches: [CandidateBatch],
     influencingTokenizedIdentifiers: [[String]],
     iterations: Int
@@ -427,7 +429,7 @@ package struct MatchCollator {
     )
   }
 
-  package static func tokenize(
+  public static func tokenize(
     influencingTokenizedIdentifier identifier: String,
     filterLowSignalTokens: Bool
   )
@@ -516,7 +518,7 @@ fileprivate extension Pattern {
 // Deprecated Entry Points
 extension MatchCollator {
   @available(*, deprecated, renamed: "selectBestMatches(for:from:in:influencingTokenizedIdentifiers:orderingTiesBy:)")
-  package static func selectBestMatches(
+  public static func selectBestMatches(
     for pattern: Pattern,
     from matches: [Match],
     in batches: [CandidateBatch],
@@ -537,11 +539,11 @@ extension MatchCollator {
     message:
       "Use the MatchCollator.Selection.precision value returned from selectBestMatches(...) to choose between fast and thorough matched text ranges."
   )
-  package static var bestMatchesThoroughScanningMinimumPatternLength: Int {
+  public static var bestMatchesThoroughScanningMinimumPatternLength: Int {
     minimumPatternLengthToAlwaysRescoreWithThoroughPrecision
   }
 }
 
 extension MatchCollator {
-  package static let minimumPatternLengthToAlwaysRescoreWithThoroughPrecision = 2
+  public static let minimumPatternLengthToAlwaysRescoreWithThoroughPrecision = 2
 }

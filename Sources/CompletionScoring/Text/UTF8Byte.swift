@@ -8,22 +8,24 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package typealias UTF8Byte = UInt8
-package extension UTF8Byte {
+public typealias UTF8Byte = UInt8
+public extension UTF8Byte {
   init(_ character: Character) throws {
     self = try character.utf8.only.unwrap(orThrow: "More than one byte: \(character)")
   }
 }
 
-package func UTF8ByteValue(_ character: Character) -> UTF8Byte? {
+public func UTF8ByteValue(_ character: Character) -> UTF8Byte? {
   character.utf8.only
 }
 
-package extension UTF8Byte {
+public extension UTF8Byte {
   static let uppercaseAZ: ClosedRange<UInt8> = (65...90)
   static let lowercaseAZ: ClosedRange<UInt8> = (97...122)
 

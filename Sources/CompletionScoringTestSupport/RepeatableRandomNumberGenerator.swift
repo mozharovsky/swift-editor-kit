@@ -8,11 +8,12 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import CompletionScoring
 import Foundation
-import SwiftExtensions
 
 package struct RepeatableRandomNumberGenerator: RandomNumberGenerator {
   private let seed: [UInt64]
@@ -108,7 +109,7 @@ private let skTestSupportInputsDirectory: URL = {
   guard let resourceURL = Bundle.module.resourceURL else {
     fatalError("could not determine resource URL for bundle: \(Bundle.module)")
   }
-  guard FileManager.default.fileExists(at: resourceURL) else {
+  guard FileManager.default.fileExists(atPath: resourceURL.path) else {
     fatalError("missing resources \(resourceURL)")
   }
   return resourceURL.appending(components: "INPUTS", directoryHint: .isDirectory).standardizedFileURL

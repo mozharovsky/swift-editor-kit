@@ -1,0 +1,34 @@
+swift-editor-kit
+Copyright (c) 2026 Evgenii Mozharovskii
+
+This product includes the CompletionScoring module of sourcekit-lsp.
+
+  sourcekit-lsp
+  https://github.com/swiftlang/sourcekit-lsp
+  Copyright (c) 2014 - 2025 Apple Inc. and the Swift project authors
+  Licensed under Apache License v2.0 with Runtime Library Exception
+
+The code comes from the tag swift-6.4.0-RELEASE at commit
+1c9871b3a0c96232d3a4db8399913198395c4303. These directories hold it.
+
+  Sources/CCompletionScoring
+  Sources/CompletionScoring
+  Sources/CompletionScoringTestSupport
+  Tests/CompletionScoringTests
+  Tests/CompletionScoringPerfTests
+
+The following changes were made to the original. Each changed file carries a
+notice below its license header.
+
+- Declarations of the CompletionScoring module that had package access are
+  public. Its extensions of standard library types keep package access.
+- Public types whose stored properties are all Sendable declare the Sendable
+  conformance that the compiler inferred for them at package access.
+- The test support no longer imports the SwiftExtensions and
+  ToolsProtocolsSwiftExtensions modules of sourcekit-lsp.
+  Sources/CompletionScoringTestSupport/StandaloneSupport.swift defines the two
+  helpers that it took from them, and a resource check calls
+  FileManager.fileExists(atPath:).
+- Tests/CompletionScoringTests/CompletionScoreTests.swift imports
+  CompletionScoring publicly because its extensions declare public members.
+- The CMake files are removed. Package.swift builds the modules with SwiftPM.

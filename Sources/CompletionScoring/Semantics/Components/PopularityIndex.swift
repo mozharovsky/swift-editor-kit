@@ -8,13 +8,15 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
 /// A `PopularityIndex` is constructed from symbol reference frequencies and uses that data to bestow
 /// `Popularity` bonuses on completions.
-package struct PopularityIndex {
+public struct PopularityIndex: Sendable {
 
   /// The namespace of a symbol.
   ///
@@ -26,11 +28,11 @@ package struct PopularityIndex {
   /// decide how precise to be, and how to spell values. They could use `[String]`, `Array<String>`
   /// or `Array`. It only matters that they refer to types consistently. They're also free to model
   /// inner types with strings like `List.Node`.
-  package struct Scope: Hashable {
-    package var container: String?
-    package var module: String
+  public struct Scope: Hashable, Sendable {
+    public var container: String?
+    public var module: String
 
-    package init(container: String?, module: String) {
+    public init(container: String?, module: String) {
       self.module = module
       self.container = container
     }
@@ -48,24 +50,24 @@ package struct PopularityIndex {
   /// consistent values. For example, they could independently track overloads by including types
   /// in function names, or they could combine all related methods by tracking only function base
   /// names.
-  package struct Symbol: Hashable {
-    package var name: String
-    package var scope: Scope
+  public struct Symbol: Hashable, Sendable {
+    public var name: String
+    public var scope: Scope
 
-    package init(name: String, scope: Scope) {
+    public init(name: String, scope: Scope) {
       self.name = name
       self.scope = scope
     }
   }
 
-  package private(set) var symbolPopularity: [Symbol: PopularityScoreComponent] = [:]
-  package private(set) var modulePopularity: [String: PopularityScoreComponent] = [:]
+  public private(set) var symbolPopularity: [Symbol: PopularityScoreComponent] = [:]
+  public private(set) var modulePopularity: [String: PopularityScoreComponent] = [:]
 
   private var knownScopes = Set<Scope>()
 
   /// Clients can use this to find a relevant `Scope`.
   /// To contruct a `Symbol` to pass to `popularity(of:)`.
-  package func isKnownScope(_ scope: Scope) -> Bool {
+  public func isKnownScope(_ scope: Scope) -> Bool {
     return knownScopes.contains(scope)
   }
 
@@ -87,7 +89,7 @@ package struct PopularityIndex {
   ///     - `notoriousSymbols`: Symbols from this list will get a significant penalty.
   ///     - `popularModules`: Symbols from these modules will get a slight bonus.
   ///     - `notoriousModules`: symbols from these modules will get a significant penalty.
-  package init(
+  public init(
     symbolReferencePercentages: [Scope: [String: Double]],
     notoriousSymbols: [Symbol],
     popularModules: [String],
@@ -133,7 +135,7 @@ package struct PopularityIndex {
     modulePopularity.raise(popularModules, toAtLeast: Popularity.scoreComponent(probability: 0.0, category: .index))
   }
 
-  package func popularity(of symbol: Symbol) -> Popularity {
+  public func popularity(of symbol: Symbol) -> Popularity {
     let symbolPopularity = symbolPopularity[symbol] ?? .none
     let modulePopularity = modulePopularity[symbol.scope.module] ?? .none
     return Popularity(symbolComponent: symbolPopularity.value, moduleComponent: modulePopularity.value)
@@ -170,7 +172,7 @@ fileprivate extension Dictionary where Value == PopularityScoreComponent {
 
 /// Implement coding with BinaryCodable without singing up for package conformance
 extension PopularityIndex {
-  package enum SerializationVersion: Int {
+  public enum SerializationVersion: Int, Sendable {
     case initial
   }
 
@@ -195,14 +197,14 @@ extension PopularityIndex {
     }
   }
 
-  package func serialize(version: SerializationVersion) -> [UInt8] {
+  public func serialize(version: SerializationVersion) -> [UInt8] {
     BinaryEncoder.encode(contentVersion: version.rawValue) { encoder in
       encoder.write(symbolPopularity.mapKeys(overwritingDuplicates: .affirmative, SerializableSymbol.init))
       encoder.write(modulePopularity)
     }
   }
 
-  package static func deserialize(data serialization: [UInt8]) throws -> Self {
+  public static func deserialize(data serialization: [UInt8]) throws -> Self {
     try BinaryDecoder.decode(bytes: serialization) { decoder in
       switch SerializationVersion(rawValue: decoder.contentVersion) {
       case .initial:

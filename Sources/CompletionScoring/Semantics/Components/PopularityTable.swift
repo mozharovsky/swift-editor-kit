@@ -8,29 +8,31 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
 // TODO: deprecate
 //@available(*, deprecated, message: "Use PopularityIndex instead.")
-package struct PopularityTable {
+public struct PopularityTable: Sendable {
   /// Represents a list of symbols form a module, with a value for each symbol representing what % of references to this module were to that symbol.
-  package struct ModuleSymbolReferenceTable {
+  public struct ModuleSymbolReferenceTable: Sendable {
     var symbolReferencePercentages: [String: Double]
     var notoriousSymbols: [String]
-    package init(symbolReferencePercentages: [String: Double], notoriousSymbols: [String] = []) {
+    public init(symbolReferencePercentages: [String: Double], notoriousSymbols: [String] = []) {
       self.symbolReferencePercentages = symbolReferencePercentages
       self.notoriousSymbols = notoriousSymbols
     }
   }
 
   /// package so `PopularityTable` can be serialized into an XPC object to be sent to the SourceKit plugin
-  package private(set) var symbolPopularity: [String: Popularity] = [:]
-  package private(set) var modulePopularity: [String: Popularity] = [:]
+  public private(set) var symbolPopularity: [String: Popularity] = [:]
+  public private(set) var modulePopularity: [String: Popularity] = [:]
 
   /// Only to be used in the SourceKit plugin when deserializing a `PopularityTable` from an XPC object.
-  package init(symbolPopularity: [String: Popularity], modulePopularity: [String: Popularity]) {
+  public init(symbolPopularity: [String: Popularity], modulePopularity: [String: Popularity]) {
     self.symbolPopularity = symbolPopularity
     self.modulePopularity = modulePopularity
   }
@@ -43,7 +45,7 @@ package struct PopularityTable {
   ///     of the list.
   ///   - popularModules: Symbols from these modules will get a slight bonus.
   ///   - notoriousModules: symbols from these modules will get a significant penalty.
-  package init(
+  public init(
     moduleSymbolReferenceTables: [ModuleSymbolReferenceTable],
     recentCompletions: [String],
     popularModules: [String],
@@ -128,7 +130,7 @@ package struct PopularityTable {
     return modulePopularity[module] ?? .none
   }
 
-  package func popularity(symbol: String?, module: String?) -> Popularity {
+  public func popularity(symbol: String?, module: String?) -> Popularity {
     let symbolPopularity = symbol.map { popularity(symbol: $0) } ?? .none
     let modulePopularity = module.map { popularity(module: $0) } ?? .none
     return Popularity(
@@ -150,13 +152,13 @@ extension [String: Popularity] {
 // TODO: deprecate
 //@available(*, deprecated, message: "Use PopularityIndex instead.")
 extension PopularityTable {
-  package init(popularSymbols: [String] = [], recentSymbols: [String] = [], notoriousSymbols: [String] = []) {
+  public init(popularSymbols: [String] = [], recentSymbols: [String] = [], notoriousSymbols: [String] = []) {
     add(popularSymbols: popularSymbols)
     recordSymbolRecencyBonuses(recentCompletions: recentSymbols)
     record(notoriousSymbols: notoriousSymbols)
   }
 
-  package mutating func add(popularSymbols: [String]) {
+  public mutating func add(popularSymbols: [String]) {
     for (index, symbol) in popularSymbols.enumerated() {
       let popularity = (1.0 - (Double(index) / Double(popularSymbols.count + 1)))  // 1.0...0.0
       let scoreComponent = scoreComponent(normalizedPopularity: popularity)
@@ -173,15 +175,15 @@ extension PopularityTable {
     renamed: "ModuleSymbolReferenceTable",
     message: "Popularity is now for modules in addition to symbols. This was renamed to be more precise."
   )
-  package typealias ModulePopularityTable = ModuleSymbolReferenceTable
+  public typealias ModulePopularityTable = ModuleSymbolReferenceTable
 
   @available(*, deprecated, message: "Pass a module name with popularity(symbol:module:)")
-  package func popularity(for symbol: String) -> Popularity {
+  public func popularity(for symbol: String) -> Popularity {
     popularity(symbol: symbol, module: nil)
   }
 
   @available(*, deprecated, message: "Pass popularModules: and notoriousModules:")
-  package init(modules: [ModuleSymbolReferenceTable], recentCompletions: [String]) {
+  public init(modules: [ModuleSymbolReferenceTable], recentCompletions: [String]) {
     self.init(
       moduleSymbolReferenceTables: modules,
       recentCompletions: recentCompletions,

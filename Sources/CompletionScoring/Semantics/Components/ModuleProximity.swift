@@ -8,11 +8,13 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package enum ModuleProximity: Equatable {
+public enum ModuleProximity: Equatable, Sendable {
   /// Example: Distance 0 is this module. if you have only "import AppKit", AppKit would be 1, Foundation and
   /// CoreGraphics would be 2.
   case imported(distance: Int)
@@ -33,11 +35,11 @@ package enum ModuleProximity: Equatable {
   /// Example: Provider was written before this enum existed, and didn't have an opportunity to provide a value
   case unspecified
 
-  package static let same = ModuleProximity.imported(distance: 0)
+  public static let same = ModuleProximity.imported(distance: 0)
 }
 
 extension ModuleProximity: BinaryCodable {
-  package init(_ decoder: inout BinaryDecoder) throws {
+  public init(_ decoder: inout BinaryDecoder) throws {
     self = try decoder.decodeEnumByte { decoder, n in
       switch n {
       case 0: return .imported(distance: try Int(&decoder))
@@ -51,7 +53,7 @@ extension ModuleProximity: BinaryCodable {
     }
   }
 
-  package func encode(_ encoder: inout BinaryEncoder) {
+  public func encode(_ encoder: inout BinaryEncoder) {
     switch self {
     case .imported(let distance):
       encoder.writeByte(0)
