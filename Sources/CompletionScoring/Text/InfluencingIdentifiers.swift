@@ -8,13 +8,15 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
 private typealias UTF8Bytes = Pattern.UTF8Bytes
 
-package struct InfluencingIdentifiers: Sendable {
+public struct InfluencingIdentifiers: Sendable {
   // `nonisolated(unsafe)` is fine because the underlying buffer is not modified until `deallocate` is called and the
   // struct must not be used anymore after `deallocate` was called.
   private nonisolated(unsafe) let identifiers: UnsafeBufferPointer<Identifier>
@@ -53,7 +55,7 @@ package struct InfluencingIdentifiers: Sendable {
   /// tokens during scoring results in referencing counting costing ~30% of the work. To avoid that, we use unsafe
   /// buffer pointers, and then this method to constrain lifetimes.
   /// - Parameter identifiers: The influencing identifiers in most to least influencing order.
-  package static func withUnsafeInfluencingTokenizedIdentifiers<R>(
+  public static func withUnsafeInfluencingTokenizedIdentifiers<R>(
     _ tokenizedIdentifiers: [[String]],
     body: (Self) throws -> R
   ) rethrows -> R {
@@ -83,7 +85,7 @@ package struct InfluencingIdentifiers: Sendable {
   /// Currently, this is implemented by tokenizing the candidate and the identifiers, and then seeing if any of the tokens
   /// match. If each identifier has one or more tokens in the candidate, return 1.0. If no tokens from the identifiers appear
   /// in the candidate, return 0.0.
-  package func score(candidate: Candidate, allocator: inout UnsafeStackAllocator) -> Double {
+  public func score(candidate: Candidate, allocator: inout UnsafeStackAllocator) -> Double {
     var candidateTokenization: Pattern.Tokenization? = nil
     defer { candidateTokenization?.deallocate(allocator: &allocator) }
     var score = 0.0

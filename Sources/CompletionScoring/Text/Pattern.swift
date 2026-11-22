@@ -8,21 +8,23 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
 /// The pattern that the user has typed and which should be used to cull and score results.
-package final class Pattern: Sendable {
-  package typealias ContentType = Candidate.ContentType
-  package typealias UTF8Bytes = UnsafeBufferPointer<UInt8>
-  package typealias UTF8ByteRange = Range<Int>
-  package enum Precision {
+public final class Pattern: Sendable {
+  public typealias ContentType = Candidate.ContentType
+  public typealias UTF8Bytes = UnsafeBufferPointer<UInt8>
+  public typealias UTF8ByteRange = Range<Int>
+  public enum Precision: Sendable {
     case fast
     case thorough
   }
 
-  package let text: String
+  public let text: String
 
   /// These all have pattern in the name to avoid confusion with their candidate counterparts in functions operating on both.
   // `nonisolated(unsafe)` is fine because the underlying buffer is never modified.
@@ -37,7 +39,7 @@ package final class Pattern: Sendable {
   private let patternHasMixedcase: Bool
   internal var patternUTF8Length: Int { patternMixedcaseBytes.count }
 
-  package init(text: String) {
+  public init(text: String) {
     self.text = text
     let mixedcaseBytes = Array(text.utf8)
     let lowercaseBytes = mixedcaseBytes.map(\.lowercasedUTF8Byte)
@@ -100,15 +102,15 @@ package final class Pattern: Sendable {
     return nil
   }
 
-  package func matches(candidate: Candidate) -> Bool {
+  public func matches(candidate: Candidate) -> Bool {
     matchLocation(candidate: candidate) != nil
   }
 
-  package func score(candidate: Candidate, precision: Precision) -> Double {
+  public func score(candidate: Candidate, precision: Precision) -> Double {
     score(candidate: candidate.bytes, contentType: candidate.contentType, precision: precision)
   }
 
-  package func score(
+  public func score(
     candidate candidateMixedcaseBytes: UTF8Bytes,
     contentType: ContentType,
     precision: Precision
@@ -124,18 +126,18 @@ package final class Pattern: Sendable {
     }
   }
 
-  package struct TextScore: Comparable {
-    package var value: Double
-    package var falseStarts: Int
+  public struct TextScore: Comparable, Sendable {
+    public var value: Double
+    public var falseStarts: Int
 
     static let worstPossibleScore = TextScore(value: -Double.infinity, falseStarts: Int.max)
 
-    package init(value: Double, falseStarts: Int) {
+    public init(value: Double, falseStarts: Int) {
       self.value = value
       self.falseStarts = falseStarts
     }
 
-    package static func < (_ lhs: Self, _ rhs: Self) -> Bool {
+    public static func < (_ lhs: Self, _ rhs: Self) -> Bool {
       return (lhs.value <? rhs.value)
         ?? (lhs.falseStarts > rhs.falseStarts)
     }
@@ -171,7 +173,7 @@ package final class Pattern: Sendable {
     }
   }
 
-  package func score(
+  public func score(
     candidate candidateMixedcaseBytes: UTF8Bytes,
     contentType: ContentType,
     precision: Precision,
@@ -197,7 +199,7 @@ package final class Pattern: Sendable {
     }
   }
 
-  package func score(
+  public func score(
     candidate candidateMixedcaseBytes: UTF8Bytes,
     contentType: ContentType,
     precision: Precision,
@@ -615,35 +617,35 @@ package final class Pattern: Sendable {
 }
 
 extension Pattern {
-  package struct ByteTokenAddress {
-    package var tokenIndex = 0
-    package var indexInToken = 0
+  public struct ByteTokenAddress: Sendable {
+    public var tokenIndex = 0
+    public var indexInToken = 0
   }
 
   /// A token is a single conceptual name piece of an identifier, usually separated by camel case or underscores.
   ///
   /// For example `doFancyStuff` is divided into 3 tokens: `do`, `Fancy`, and `Stuff`.
-  package struct Token {
+  public struct Token: Sendable {
     var storage: UInt
     init(length: Int, allUppercase: Bool) {
       let bit: UInt = (allUppercase ? 1 : 0) << (Int.bitWidth - 1)
       storage = UInt(bitPattern: length) | bit
     }
 
-    package var length: Int {
+    public var length: Int {
       Int(bitPattern: UInt(storage & ~(1 << (Int.bitWidth - 1))))
     }
 
-    package var allUppercase: Bool {
+    public var allUppercase: Bool {
       (storage & (1 << (Int.bitWidth - 1))) != 0
     }
   }
 
-  package struct Tokenization {
-    package private(set) var baseNameLength: Int
-    package private(set) var hasNonUppercaseNonDelimiterBytes: Bool
-    package private(set) var tokens: UnsafeStackArray<Token>
-    package private(set) var byteTokenAddresses: UnsafeStackArray<ByteTokenAddress>
+  public struct Tokenization {
+    public private(set) var baseNameLength: Int
+    public private(set) var hasNonUppercaseNonDelimiterBytes: Bool
+    public private(set) var tokens: UnsafeStackArray<Token>
+    public private(set) var byteTokenAddresses: UnsafeStackArray<ByteTokenAddress>
 
     var tokenCount: Int {
       tokens.count
@@ -772,12 +774,12 @@ extension Pattern {
       return false
     }
 
-    package mutating func deallocate(allocator: inout UnsafeStackAllocator) {
+    public mutating func deallocate(allocator: inout UnsafeStackAllocator) {
       allocator.deallocate(&tokens)
       allocator.deallocate(&byteTokenAddresses)
     }
 
-    package static func allocate(
+    public static func allocate(
       mixedcaseBytes: UTF8Bytes,
       contentType: ContentType,
       allocator: inout UnsafeStackAllocator
@@ -1130,7 +1132,7 @@ extension Pattern {
 }
 
 extension Pattern {
-  package func test_searchStart(candidate: Candidate, contentType: ContentType) -> [Int] {
+  public func test_searchStart(candidate: Candidate, contentType: ContentType) -> [Int] {
     UnsafeStackAllocator.withUnsafeStackAllocator { allocator in
       var indexedCandidate = IndexedCandidate.allocate(
         referencing: candidate.bytes,
@@ -1149,7 +1151,7 @@ extension Pattern {
     }
   }
 
-  package func testPerformance_tokenizing(batch: CandidateBatch, contentType: ContentType) -> Int {
+  public func testPerformance_tokenizing(batch: CandidateBatch, contentType: ContentType) -> Int {
     UnsafeStackAllocator.withUnsafeStackAllocator { allocator in
       var all = 0
       batch.enumerate { candidate in
@@ -1255,7 +1257,7 @@ extension Candidate.ContentType {
 
 extension Pattern {
   @available(*, deprecated, message: "Pass a contentType")
-  package func score(
+  public func score(
     candidate: UTF8Bytes,
     precision: Precision,
     captureMatchingRanges: Bool,
@@ -1271,7 +1273,7 @@ extension Pattern {
   }
 
   @available(*, deprecated, message: "Pass a contentType")
-  package func score(candidate: UTF8Bytes, precision: Precision) -> Double {
+  public func score(candidate: UTF8Bytes, precision: Precision) -> Double {
     score(candidate: candidate, contentType: .codeCompletionSymbol, precision: precision)
   }
 }

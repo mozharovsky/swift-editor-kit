@@ -8,11 +8,13 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package enum Availability: Equatable {
+public enum Availability: Equatable, Sendable {
   /// Example: Either not tagged, or explicit availability is compatible with current build context
   case available
 
@@ -67,9 +69,9 @@ extension Availability: BinaryCodable {
 }
 
 @available(*, deprecated, renamed: "Availability")
-package typealias DeprecationStatus = Availability
+public typealias DeprecationStatus = Availability
 
 extension Availability {
   @available(*, deprecated, renamed: "Availability.available")
-  package static let none = DeprecationStatus.available
+  public static let none = DeprecationStatus.available
 }

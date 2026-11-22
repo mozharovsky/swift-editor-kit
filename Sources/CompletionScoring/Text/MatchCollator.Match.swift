@@ -8,26 +8,28 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
 extension MatchCollator {
-  package struct Match {
+  public struct Match: Sendable {
     /// For client use, has no meaning to CompletionScoring, useful when mapping Match instances back to
     /// higher level constructs.
-    package var identifier: Int
+    public var identifier: Int
 
-    package var batchIndex: Int
+    public var batchIndex: Int
 
-    package var candidateIndex: Int
+    public var candidateIndex: Int
 
     /// Items with the same (groupID, batchID) sort together. Initially used to locate types with their initializers.
-    package var groupID: Int?
+    public var groupID: Int?
 
-    package var score: CompletionScore
+    public var score: CompletionScore
 
-    package init(batchIndex: Int, candidateIndex: Int, groupID: Int?, score: CompletionScore) {
+    public init(batchIndex: Int, candidateIndex: Int, groupID: Int?, score: CompletionScore) {
       self.init(
         identifier: 0,
         batchIndex: batchIndex,
@@ -37,7 +39,7 @@ extension MatchCollator {
       )
     }
 
-    package init(identifier: Int, batchIndex: Int, candidateIndex: Int, groupID: Int?, score: CompletionScore) {
+    public init(identifier: Int, batchIndex: Int, candidateIndex: Int, groupID: Int?, score: CompletionScore) {
       self.identifier = identifier
       self.batchIndex = batchIndex
       self.candidateIndex = candidateIndex

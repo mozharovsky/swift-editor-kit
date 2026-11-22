@@ -8,11 +8,13 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package enum StructuralProximity: Equatable {
+public enum StructuralProximity: Equatable, Sendable {
   /// Example: Definition is in Project/Framework/UI/View.swift, usage site is Project/Framework/Model/View.swift,
   /// so hops == 2, up one, and into a sibling. Hops is edit distance where the operations are 'delete, add', not replace.
   case project(fileSystemHops: Int?)

@@ -8,16 +8,18 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package struct PopularityScoreComponent: Equatable, Comparable {
+public struct PopularityScoreComponent: Equatable, Comparable, Sendable {
   var value: Double
   static let unspecified = PopularityScoreComponent(value: unspecifiedScore)
   static let none = PopularityScoreComponent(value: 1.0)
 
-  package static func < (_ lhs: Self, _ rhs: Self) -> Bool {
+  public static func < (_ lhs: Self, _ rhs: Self) -> Bool {
     lhs.value < rhs.value
   }
 }
@@ -32,20 +34,20 @@ extension PopularityScoreComponent: BinaryCodable {
   }
 }
 
-package struct Popularity: Equatable, Comparable {
-  package var scoreComponent: Double {
+public struct Popularity: Equatable, Comparable, Sendable {
+  public var scoreComponent: Double {
     symbolComponent * moduleComponent
   }
 
-  package var symbolComponent: Double
+  public var symbolComponent: Double
 
-  package var moduleComponent: Double
+  public var moduleComponent: Double
 
   // TODO: remove once `PopularityTable` is removed.
-  package static let unspecified = Popularity(scoreComponent: unspecifiedScore)
-  package static let none = Popularity(scoreComponent: 1.0)
+  public static let unspecified = Popularity(scoreComponent: unspecifiedScore)
+  public static let none = Popularity(scoreComponent: 1.0)
 
-  package enum Category {
+  public enum Category: Sendable {
     /// Used by `PopularityIndex`, where the popularities don't have much context.
     case index
 
@@ -75,12 +77,12 @@ package struct Popularity: Equatable, Comparable {
   }
 
   @available(*, deprecated)
-  package init(probability: Double) {
+  public init(probability: Double) {
     self.init(probability: probability, category: .index)
   }
 
   /// - Parameter probability: a value in range `0...1`
-  package init(probability: Double, category: Category) {
+  public init(probability: Double, category: Category) {
     let score = Self.scoreComponent(probability: probability, category: category)
     self.init(scoreComponent: score)
   }
@@ -97,7 +99,7 @@ package struct Popularity: Equatable, Comparable {
     return (probability * (max - min)) + min
   }
 
-  package init(scoreComponent: Double) {
+  public init(scoreComponent: Double) {
     self.symbolComponent = scoreComponent
     self.moduleComponent = 1.0
   }
@@ -107,7 +109,7 @@ package struct Popularity: Equatable, Comparable {
     self.moduleComponent = moduleComponent
   }
 
-  package static func < (_ lhs: Self, _ rhs: Self) -> Bool {
+  public static func < (_ lhs: Self, _ rhs: Self) -> Bool {
     lhs.scoreComponent < rhs.scoreComponent
   }
 }

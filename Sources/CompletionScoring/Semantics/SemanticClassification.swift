@@ -8,23 +8,25 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package struct SemanticClassification: Equatable {
-  package var completionKind: CompletionKind
-  package var popularity: Popularity
-  package var moduleProximity: ModuleProximity
-  package var scopeProximity: ScopeProximity
-  package var structuralProximity: StructuralProximity
-  package var typeCompatibility: TypeCompatibility
-  package var synchronicityCompatibility: SynchronicityCompatibility
-  package var availability: Availability
-  package var flair: Flair
+public struct SemanticClassification: Equatable, Sendable {
+  public var completionKind: CompletionKind
+  public var popularity: Popularity
+  public var moduleProximity: ModuleProximity
+  public var scopeProximity: ScopeProximity
+  public var structuralProximity: StructuralProximity
+  public var typeCompatibility: TypeCompatibility
+  public var synchronicityCompatibility: SynchronicityCompatibility
+  public var availability: Availability
+  public var flair: Flair
 
   /// - Note: There is no natural order to these arguments, so they're alphabetical.
-  package init(
+  public init(
     availability: Availability,
     completionKind: CompletionKind,
     flair: Flair,
@@ -46,7 +48,7 @@ package struct SemanticClassification: Equatable {
     self.typeCompatibility = typeCompatibility
   }
 
-  package var score: Double {
+  public var score: Double {
     let score =
       availability.scoreComponent
       * completionKind.scoreComponent
@@ -70,10 +72,10 @@ package struct SemanticClassification: Equatable {
     return 1.0
   }
 
-  package struct ComponentDebugDescription {
-    package let name: String
-    package let instance: String
-    package let scoreComponent: Double
+  public struct ComponentDebugDescription: Sendable {
+    public let name: String
+    public let instance: String
+    public let scoreComponent: Double
   }
 
   private var scoreComponents: [any CompletionScoreComponent] {
@@ -104,7 +106,7 @@ package struct SemanticClassification: Equatable {
     ]
   }
 
-  package var componentsDebugDescription: [ComponentDebugDescription] {
+  public var componentsDebugDescription: [ComponentDebugDescription] {
     return scoreComponents.map { $0.componentDebugDescription }
   }
 }
@@ -137,19 +139,19 @@ extension SemanticClassification: BinaryCodable {
 
 /// Published serialization methods
 extension SemanticClassification {
-  package func byteRepresentation() -> [UInt8] {
+  public func byteRepresentation() -> [UInt8] {
     binaryCodedRepresentation(contentVersion: 0)
   }
 
-  package init(byteRepresentation: [UInt8]) throws {
+  public init(byteRepresentation: [UInt8]) throws {
     try self.init(binaryCodedRepresentation: byteRepresentation)
   }
 
-  package static func byteRepresentation(classifications: [Self]) -> [UInt8] {
+  public static func byteRepresentation(classifications: [Self]) -> [UInt8] {
     classifications.binaryCodedRepresentation(contentVersion: 0)
   }
 
-  package static func classifications(byteRepresentations: [UInt8]) throws -> [Self] {
+  public static func classifications(byteRepresentations: [UInt8]) throws -> [Self] {
     try [Self].init(binaryCodedRepresentation: byteRepresentations)
   }
 }

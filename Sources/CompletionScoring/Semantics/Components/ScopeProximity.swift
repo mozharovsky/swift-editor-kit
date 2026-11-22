@@ -8,11 +8,13 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package enum ScopeProximity: Equatable {
+public enum ScopeProximity: Equatable, Sendable {
   /// Example: Within the context of a function, a local definition. Could be a variable, or an inner function, type,
   /// etc...
   case local

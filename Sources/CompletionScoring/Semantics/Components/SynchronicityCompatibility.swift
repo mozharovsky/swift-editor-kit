@@ -8,11 +8,13 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package enum SynchronicityCompatibility: Equatable {
+public enum SynchronicityCompatibility: Equatable, Sendable {
   /// Example: sync->sync, async->sync, async->await async
   case compatible
 

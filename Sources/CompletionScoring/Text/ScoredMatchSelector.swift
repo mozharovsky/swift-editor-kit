@@ -8,6 +8,8 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
@@ -18,14 +20,14 @@ import Foundation
 ///
 /// It's primary performance improvement is that it creates and initializes all of the scratch buffers ahead of time, so that they can be
 /// amortized across all matching calls.
-package class ScoredMatchSelector {
+public class ScoredMatchSelector {
   typealias CandidateBatchSlice = Pattern.ScoringWorkload.CandidateBatchSlice
   typealias CandidateBatchesMatch = Pattern.CandidateBatchesMatch
   typealias ScoringWorkload = Pattern.ScoringWorkload
 
   private let threadWorkloads: [ThreadWorkload]
   private let queue: DispatchQueue
-  package init(batches: [CandidateBatch]) {
+  public init(batches: [CandidateBatch]) {
     let scoringWorkloads = ScoringWorkload.workloads(
       for: batches,
       parallelism: ProcessInfo.processInfo.activeProcessorCount
@@ -37,7 +39,7 @@ package class ScoredMatchSelector {
   }
 
   /// Find all of the matches across `batches` and score them, returning the scored results. This is a first part of selecting matches. Later the matches will be combined with matches from other providers, where we'll pick the best matches and sort them with `selectBestMatches(from:textProvider:)`
-  package func scoredMatches(pattern: Pattern, precision: Pattern.Precision) -> [Pattern.CandidateBatchesMatch] {
+  public func scoredMatches(pattern: Pattern, precision: Pattern.Precision) -> [Pattern.CandidateBatchesMatch] {
     /// The whole point is share the allocation space across many re-uses, but if the client calls into us concurrently, we shouldn't just crash. An assert would also be acceptable.
     return queue.sync {
       // `nonisolated(unsafe)` is fine because every concurrent iteration accesses a different element.

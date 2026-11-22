@@ -8,31 +8,33 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-package struct Flair: OptionSet {
-  package var rawValue: Int64
+public struct Flair: OptionSet, Sendable {
+  public var rawValue: Int64
 
-  package init(rawValue: Int64) {
+  public init(rawValue: Int64) {
     self.rawValue = rawValue
   }
 
-  package init(_ rawValue: Int64) {
+  public init(_ rawValue: Int64) {
     self.rawValue = rawValue
   }
 
   /// Xcode prior to version 13, grouped many high priority completions under the tag 'expression specific'.
   /// To aid in mapping those into the new API, redefine this case as a catch-all 'high priority' expression.
   /// Please do not use it for new cases, instead, add a case to this enum to model the significance of the completion.
-  package static let oldExpressionSpecific_pleaseAddSpecificCaseToThisEnum = Flair(1 << 0)
+  public static let oldExpressionSpecific_pleaseAddSpecificCaseToThisEnum = Flair(1 << 0)
 
   /// E.g. `override func foo() { super.foo() ...`
-  package static let chainedCallToSuper = Flair(1 << 1)
+  public static let chainedCallToSuper = Flair(1 << 1)
 
   /// E.g. `bar.baz` in `foo.bar.baz`.
-  package static let chainedMember = Flair(1 << 2)
+  public static let chainedMember = Flair(1 << 2)
 
   /// E.g. using class, struct, protocol, public, private, or fileprivate at file level.
   internal static let _situationallyLikely = Flair(1 << 3)
@@ -44,25 +46,25 @@ package struct Flair: OptionSet {
   internal static let _situationallyInvalid = Flair(1 << 5)
 
   /// E.g. an instance method/property in SwiftUI ViewBuilder with implicit-self context.
-  package static let swiftUIModifierOnSelfWhileBuildingSelf = Flair(1 << 6)
+  public static let swiftUIModifierOnSelfWhileBuildingSelf = Flair(1 << 6)
 
   /// E.g. `frame()`, since you almost certainly want to pass an argument to it.
-  package static let swiftUIUnlikelyViewMember = Flair(1 << 7)
+  public static let swiftUIUnlikelyViewMember = Flair(1 << 7)
 
   /// E.g. using struct, enum, protocol, class, public, private, or fileprivate at file level.
-  package static let commonKeywordAtCurrentPosition = Flair(1 << 8)
+  public static let commonKeywordAtCurrentPosition = Flair(1 << 8)
 
   /// E.g. nesting class in a function.
-  package static let rareKeywordAtCurrentPosition = Flair(1 << 9)
+  public static let rareKeywordAtCurrentPosition = Flair(1 << 9)
 
   /// E.g. using a protocol by name in an expression in a non-type position. `let x = 3 + Comparable…`
-  package static let rareTypeAtCurrentPosition = Flair(1 << 10)
+  public static let rareTypeAtCurrentPosition = Flair(1 << 10)
 
   /// E.g. referencing a type, function, etc… at top level position in a non script/main.swift file.
-  package static let expressionAtNonScriptOrMainFileScope = Flair(1 << 11)
+  public static let expressionAtNonScriptOrMainFileScope = Flair(1 << 11)
 
   /// E.g. `printContents`, which is almost never what you want when typing `print`.
-  package static let rareMemberWithCommonName = Flair(1 << 12)
+  public static let rareMemberWithCommonName = Flair(1 << 12)
 
   @available(
     *,
@@ -72,7 +74,7 @@ package struct Flair: OptionSet {
         When using, file a bug report to name the new situational oddity so that we can directly model it.
       """
   )
-  package static let situationallyLikely = _situationallyLikely
+  public static let situationallyLikely = _situationallyLikely
 
   @available(
     *,
@@ -82,7 +84,7 @@ package struct Flair: OptionSet {
         When using, file a bug report to name the new situational oddity so that we can directly model it.
       """
   )
-  package static let situationallyUnlikely = _situationallyUnlikely
+  public static let situationallyUnlikely = _situationallyUnlikely
 
   @available(
     *,
@@ -92,7 +94,7 @@ package struct Flair: OptionSet {
         When using, file a bug report to name the new situational oddity so that we can directly model it.
       """
   )
-  package static let situationallyInvalid = _situationallyInvalid
+  public static let situationallyInvalid = _situationallyInvalid
 }
 
 extension Flair: CustomDebugStringConvertible {
@@ -115,7 +117,7 @@ extension Flair: CustomDebugStringConvertible {
     (.rareMemberWithCommonName, "rareMemberWithCommonName"),
   ]
 
-  package var debugDescription: String {
+  public var debugDescription: String {
     var descriptions = [String]()
     for (flair, name) in Self.namedValues {
       if self.contains(flair) {
@@ -133,7 +135,7 @@ extension Flair: CustomDebugStringConvertible {
 extension Flair: OptionSetBinaryCodable {}
 
 extension Flair {
-  package var factor: Double {
+  public var factor: Double {
     return self.scoreComponent
   }
 }

@@ -8,15 +8,17 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
 extension MatchCollator {
   /// The result of best match selection.
-  package struct Selection {
+  public struct Selection: Sendable {
     /// The precision used during matching, which varies based on the number of candidates and the input pattern length.
-    package var precision: Pattern.Precision
-    package var matches: [Match]
+    public var precision: Pattern.Precision
+    public var matches: [Match]
   }
 }

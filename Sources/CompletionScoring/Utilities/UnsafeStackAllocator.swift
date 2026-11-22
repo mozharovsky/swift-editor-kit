@@ -8,6 +8,8 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
+// Modified from the sourcekit-lsp original. See NOTICE for the changes.
+//
 //===----------------------------------------------------------------------===//
 
 import Foundation
@@ -24,7 +26,7 @@ private struct Bytes2048 { var storage: (Bytes1024, Bytes1024) = (.init(), .init
 private struct Bytes4096 { var storage: (Bytes2048, Bytes2048) = (.init(), .init()) }
 private struct Bytes8192 { var storage: (Bytes4096, Bytes4096) = (.init(), .init()) }
 
-package struct UnsafeStackAllocator {
+public struct UnsafeStackAllocator: Sendable {
   private typealias Storage = Bytes8192
   private var storage = Storage()
   private static let pageSize = 64
@@ -37,7 +39,7 @@ package struct UnsafeStackAllocator {
   private init() {
   }
 
-  package static func withUnsafeStackAllocator<R>(body: (inout Self) throws -> R) rethrows -> R {
+  public static func withUnsafeStackAllocator<R>(body: (inout Self) throws -> R) rethrows -> R {
     var allocator = Self()
     defer { assert(allocator.pagesAllocated == 0) }
     return try body(&allocator)
@@ -124,7 +126,7 @@ package struct UnsafeStackAllocator {
     array = UnsafeStackArray(base: array.base, capacity: 0)
   }
 
-  package mutating func withStackArray<Element, R>(
+  public mutating func withStackArray<Element, R>(
     of elementType: Element.Type,
     maximumCapacity: Int,
     body: (inout UnsafeStackArray<Element>) throws -> R
@@ -135,10 +137,10 @@ package struct UnsafeStackAllocator {
   }
 }
 
-package struct UnsafeStackArray<Element> {
+public struct UnsafeStackArray<Element> {
   private(set) var base: UnsafeMutablePointer<Element>
   fileprivate let capacity: Int
-  package private(set) var count = 0
+  public private(set) var count = 0
 
   fileprivate init(base: UnsafeMutablePointer<Element>, capacity: Int) {
     self.base = base
@@ -154,13 +156,13 @@ package struct UnsafeStackArray<Element> {
     count = capacity
   }
 
-  package mutating func fill(with element: Element) {
+  public mutating func fill(with element: Element) {
     while count < capacity {
       append(element)
     }
   }
 
-  package mutating func removeAll() {
+  public mutating func removeAll() {
     base.deinitialize(count: count)
     count = 0
   }
@@ -171,7 +173,7 @@ package struct UnsafeStackArray<Element> {
     }
   }
 
-  package mutating func append(_ element: Element) {
+  public mutating func append(_ element: Element) {
     assert(count < capacity)
     (base + count).initialize(to: element)
     count += 1
@@ -181,13 +183,13 @@ package struct UnsafeStackArray<Element> {
     append(element)
   }
 
-  package mutating func removeLast() {
+  public mutating func removeLast() {
     assert(count > 0)
     (base + count - 1).deinitialize(count: 1)
     count -= 1
   }
 
-  package subscript(_ index: Int) -> Element {
+  public subscript(_ index: Int) -> Element {
     get {
       assert(index < count)
       return (base + index).pointee
@@ -198,7 +200,7 @@ package struct UnsafeStackArray<Element> {
     }
   }
 
-  package mutating func truncate(to countLimit: Int) {
+  public mutating func truncate(to countLimit: Int) {
     assert(countLimit >= 0)
     if count > countLimit {
       (base + countLimit).deinitialize(count: count - countLimit)
@@ -222,11 +224,11 @@ package struct UnsafeStackArray<Element> {
 }
 
 extension UnsafeStackArray: RandomAccessCollection {
-  package var startIndex: Int {
+  public var startIndex: Int {
     0
   }
 
-  package var endIndex: Int {
+  public var endIndex: Int {
     count
   }
 }
@@ -235,7 +237,7 @@ extension UnsafeStackArray: MutableCollection {
 }
 
 extension UnsafeStackArray {
-  package mutating func popLast() -> Element? {
+  public mutating func popLast() -> Element? {
     let last = last
     if hasContent {
       removeLast()
