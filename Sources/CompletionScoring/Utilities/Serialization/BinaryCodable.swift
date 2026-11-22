@@ -8,8 +8,6 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
-// Modified from the sourcekit-lsp original. See NOTICE for the changes.
-//
 //===----------------------------------------------------------------------===//
 
 import Foundation
@@ -40,7 +38,7 @@ import Foundation
 /// clients decode values, and which types they use. If your encoder encodes a bool and two ints, your decoder must
 /// decode a bool and two ints, otherwise the next structure to be decoded would read what ever you didn't decode,
 /// rather than what it encoded.
-public protocol BinaryCodable {
+package protocol BinaryCodable {
 
   /// Initialize self using values previously writen in `encode(_:)`. All values written by `encode(_:)` must be read
   /// by `init(_:)`, in the same order, using the same types. Otherwise the next structure to decode will read the
@@ -53,14 +51,14 @@ public protocol BinaryCodable {
 
 extension BinaryCodable {
   /// Convenience method to encode a structure to a byte array
-  public func binaryCodedRepresentation(contentVersion: Int) -> [UInt8] {
+  package func binaryCodedRepresentation(contentVersion: Int) -> [UInt8] {
     BinaryEncoder.encode(contentVersion: contentVersion) { encoder in
       encoder.write(self)
     }
   }
 
   /// Convenience method to decode a structure from a byte array
-  public init(binaryCodedRepresentation: [UInt8]) throws {
+  package init(binaryCodedRepresentation: [UInt8]) throws {
     self = try BinaryDecoder.decode(bytes: binaryCodedRepresentation) { decoder in
       try Self(&decoder)
     }

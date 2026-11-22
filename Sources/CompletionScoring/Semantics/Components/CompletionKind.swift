@@ -53,7 +53,7 @@ public enum CompletionKind: Equatable, Sendable {
 }
 
 extension CompletionKind: BinaryCodable {
-  public init(_ decoder: inout BinaryDecoder) throws {
+  package init(_ decoder: inout BinaryDecoder) throws {
     self = try decoder.decodeEnumByte { decoder, n in
       switch n {
       case 0: return .keyword
@@ -73,7 +73,7 @@ extension CompletionKind: BinaryCodable {
     }
   }
 
-  public func encode(_ encoder: inout BinaryEncoder) {
+  package func encode(_ encoder: inout BinaryEncoder) {
     let value: UInt8
     switch self {
     case .keyword: value = 0

@@ -33,7 +33,7 @@ public enum StructuralProximity: Equatable, Sendable {
 }
 
 extension StructuralProximity: BinaryCodable {
-  public init(_ decoder: inout BinaryDecoder) throws {
+  package init(_ decoder: inout BinaryDecoder) throws {
     self = try decoder.decodeEnumByte { decoder, n in
       switch n {
       case 0: return .project(fileSystemHops: try Int?(&decoder))
@@ -46,7 +46,7 @@ extension StructuralProximity: BinaryCodable {
     }
   }
 
-  public func encode(_ encoder: inout BinaryEncoder) {
+  package func encode(_ encoder: inout BinaryEncoder) {
     switch self {
     case .project(let hops):
       encoder.writeByte(0)

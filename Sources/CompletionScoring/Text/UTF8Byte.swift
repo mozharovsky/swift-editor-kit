@@ -15,7 +15,7 @@
 import Foundation
 
 public typealias UTF8Byte = UInt8
-public extension UTF8Byte {
+package extension UTF8Byte {
   init(_ character: Character) throws {
     self = try character.utf8.only.unwrap(orThrow: "More than one byte: \(character)")
   }
@@ -25,7 +25,7 @@ public func UTF8ByteValue(_ character: Character) -> UTF8Byte? {
   character.utf8.only
 }
 
-public extension UTF8Byte {
+package extension UTF8Byte {
   static let uppercaseAZ: ClosedRange<UInt8> = (65...90)
   static let lowercaseAZ: ClosedRange<UInt8> = (97...122)
 

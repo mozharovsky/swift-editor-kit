@@ -50,7 +50,7 @@ extension TypeCompatibility {
 }
 
 extension TypeCompatibility: BinaryCodable {
-  public init(_ decoder: inout BinaryDecoder) throws {
+  package init(_ decoder: inout BinaryDecoder) throws {
     self = try decoder.decodeEnumByte { decoder, n in
       switch n {
       case 0: return .compatible
@@ -64,7 +64,7 @@ extension TypeCompatibility: BinaryCodable {
     }
   }
 
-  public func encode(_ encoder: inout BinaryEncoder) {
+  package func encode(_ encoder: inout BinaryEncoder) {
     let value: UInt8
     switch self {
     case .compatible: value = 0

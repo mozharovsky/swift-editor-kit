@@ -13,6 +13,8 @@ xcrun swift build --build-tests
 xcrun swift test
 ```
 
+On Linux, run the same commands without `xcrun`.
+
 ## Upstream code
 
 Each module keeps the code of its upstream project. A change to an upstream file needs a reason

@@ -48,7 +48,7 @@ public enum ScopeProximity: Equatable, Sendable {
 }
 
 extension ScopeProximity: BinaryCodable {
-  public init(_ decoder: inout BinaryDecoder) throws {
+  package init(_ decoder: inout BinaryDecoder) throws {
     self = try decoder.decodeEnumByte { decoder, n in
       switch n {
       case 0: return .local
@@ -65,7 +65,7 @@ extension ScopeProximity: BinaryCodable {
     }
   }
 
-  public func encode(_ encoder: inout BinaryEncoder) {
+  package func encode(_ encoder: inout BinaryEncoder) {
     let value: UInt8
     switch self {
     case .local: value = 0

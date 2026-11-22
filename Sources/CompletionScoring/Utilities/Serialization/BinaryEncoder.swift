@@ -8,13 +8,11 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
-// Modified from the sourcekit-lsp original. See NOTICE for the changes.
-//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
-public struct BinaryEncoder: Sendable {
+package struct BinaryEncoder {
   private var stream: [UInt8] = []
   static let maximumUnderstoodStreamVersion = 0
   let contentVersion: Int

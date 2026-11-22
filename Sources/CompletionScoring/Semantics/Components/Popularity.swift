@@ -25,11 +25,11 @@ public struct PopularityScoreComponent: Equatable, Comparable, Sendable {
 }
 
 extension PopularityScoreComponent: BinaryCodable {
-  public init(_ decoder: inout BinaryDecoder) throws {
+  package init(_ decoder: inout BinaryDecoder) throws {
     value = try Double(&decoder)
   }
 
-  public func encode(_ encoder: inout BinaryEncoder) {
+  package func encode(_ encoder: inout BinaryEncoder) {
     encoder.write(value)
   }
 }
@@ -115,12 +115,12 @@ public struct Popularity: Equatable, Comparable, Sendable {
 }
 
 extension Popularity: BinaryCodable {
-  public init(_ decoder: inout BinaryDecoder) throws {
+  package init(_ decoder: inout BinaryDecoder) throws {
     symbolComponent = try Double(&decoder)
     moduleComponent = try Double(&decoder)
   }
 
-  public func encode(_ encoder: inout BinaryEncoder) {
+  package func encode(_ encoder: inout BinaryEncoder) {
     encoder.write(symbolComponent)
     encoder.write(moduleComponent)
   }

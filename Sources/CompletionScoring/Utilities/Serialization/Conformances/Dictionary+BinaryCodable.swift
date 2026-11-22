@@ -8,14 +8,12 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
-// Modified from the sourcekit-lsp original. See NOTICE for the changes.
-//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
 extension Dictionary: BinaryCodable where Key: BinaryCodable, Value: BinaryCodable {
-  public init(_ decoder: inout BinaryDecoder) throws {
+  package init(_ decoder: inout BinaryDecoder) throws {
     let count = try Int(&decoder)
     self.init(capacity: count)
     for _ in 0..<count {
@@ -28,7 +26,7 @@ extension Dictionary: BinaryCodable where Key: BinaryCodable, Value: BinaryCodab
     }
   }
 
-  public func encode(_ encoder: inout BinaryEncoder) {
+  package func encode(_ encoder: inout BinaryEncoder) {
     encoder.write(count)
     for element in self {
       encoder.write(element.key)

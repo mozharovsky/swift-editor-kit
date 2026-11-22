@@ -112,7 +112,7 @@ public struct SemanticClassification: Equatable, Sendable {
 }
 
 extension SemanticClassification: BinaryCodable {
-  public init(_ decoder: inout BinaryDecoder) throws {
+  package init(_ decoder: inout BinaryDecoder) throws {
     availability = try Availability(&decoder)
     completionKind = try CompletionKind(&decoder)
     flair = try Flair(&decoder)
@@ -124,7 +124,7 @@ extension SemanticClassification: BinaryCodable {
     typeCompatibility = try TypeCompatibility(&decoder)
   }
 
-  public func encode(_ encoder: inout BinaryEncoder) {
+  package func encode(_ encoder: inout BinaryEncoder) {
     encoder.write(availability)
     encoder.write(completionKind)
     encoder.write(flair)

@@ -21,7 +21,9 @@ The following changes were made to the original. Each changed file carries a
 notice below its license header.
 
 - Declarations of the CompletionScoring module that had package access are
-  public. Its extensions of standard library types keep package access.
+  public. Its extensions of standard library types and its binary
+  serialization keep package access. The serialization is BinaryCodable,
+  BinaryEncoder, BinaryDecoder, and the members that implement BinaryCodable.
 - Public types whose stored properties are all Sendable declare the Sendable
   conformance that the compiler inferred for them at package access.
 - The test support no longer imports the SwiftExtensions and

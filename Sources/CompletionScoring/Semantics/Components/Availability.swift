@@ -38,7 +38,7 @@ public enum Availability: Equatable, Sendable {
 }
 
 extension Availability: BinaryCodable {
-  public init(_ decoder: inout BinaryDecoder) throws {
+  package init(_ decoder: inout BinaryDecoder) throws {
     self = try decoder.decodeEnumByte { decoder, n in
       switch n {
       case 0: return .available
@@ -53,7 +53,7 @@ extension Availability: BinaryCodable {
     }
   }
 
-  public func encode(_ encoder: inout BinaryEncoder) {
+  package func encode(_ encoder: inout BinaryEncoder) {
     let value: UInt8
     switch self {
     case .available: value = 0

@@ -8,19 +8,17 @@
 // See https://swift.org/LICENSE.txt for license information
 // See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
 //
-// Modified from the sourcekit-lsp original. See NOTICE for the changes.
-//
 //===----------------------------------------------------------------------===//
 
 import Foundation
 
 extension String: BinaryCodable {
-  public init(_ decoder: inout BinaryDecoder) throws {
+  package init(_ decoder: inout BinaryDecoder) throws {
     let utf8Bytes = try decoder.readRawBytes(count: Int(&decoder))
     self = try String(bytes: utf8Bytes, encoding: .utf8).unwrap(orThrow: "Invalid UTF8 sequence")
   }
 
-  public func encode(_ encoder: inout BinaryEncoder) {
+  package func encode(_ encoder: inout BinaryEncoder) {
     withUncachedUTF8Bytes { utf8Bytes in
       encoder.write(utf8Bytes.count)
       encoder.write(rawBytes: utf8Bytes)

@@ -39,7 +39,7 @@ public enum ModuleProximity: Equatable, Sendable {
 }
 
 extension ModuleProximity: BinaryCodable {
-  public init(_ decoder: inout BinaryDecoder) throws {
+  package init(_ decoder: inout BinaryDecoder) throws {
     self = try decoder.decodeEnumByte { decoder, n in
       switch n {
       case 0: return .imported(distance: try Int(&decoder))
@@ -53,7 +53,7 @@ extension ModuleProximity: BinaryCodable {
     }
   }
 
-  public func encode(_ encoder: inout BinaryEncoder) {
+  package func encode(_ encoder: inout BinaryEncoder) {
     switch self {
     case .imported(let distance):
       encoder.writeByte(0)

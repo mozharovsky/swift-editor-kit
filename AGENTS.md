@@ -29,6 +29,9 @@ allows, so that a later tag applies without conflicts.
 - Public access covers the module's own types, protocols, and their members. Extensions of
   standard library types keep package access, so they stay out of the files that import the
   module.
+- The binary serialization keeps package access too. It covers `BinaryCodable`,
+  `BinaryEncoder`, `BinaryDecoder`, and the members that implement `BinaryCodable`. A public
+  `BinaryCodable` would make its conformances of standard library types public.
 - A move to a newer upstream tag replaces the module's directories with the tag's files, applies
   the changes in NOTICE again, and updates the tag and commit in NOTICE. It lands in a pull
   request of its own.
@@ -51,6 +54,8 @@ Run these checks before every commit.
 xcrun swift build --build-tests
 xcrun swift test
 ```
+
+On Linux, run the same commands without `xcrun`.
 
 The GitHub workflow runs the same build and tests on macOS and on Linux, and it checks that every
 commit of a pull request carries a sign-off.
